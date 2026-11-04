@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MailIcon, LockIcon, ArrowRightIcon, User2Icon } from "lucide-react";
+import api from "../api/axios";
+import { useAuth } from "../components/context/AuthContext";
+import toast from "react-hot-toast";
 
 export default function Login() {
     const [loginState, setLoginState] = useState(true);
@@ -9,14 +12,28 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+
+        const endpoint = loginState ? "/api/auth/login" : "/api/auth/register";
+        const payload = loginState ? { email, password } : { name, email, password };
+
+        try {
+            const res = await api.post(endpoint, payload);
+            const { _id, name: userName, email: userEmail, token } = res.data;
+
+            login({ _id, name: userName, email: userEmail }, token);
+            toast.success(loginState ? "Welcome back!" : "Account created successfully!");
             navigate("/dashboard");
-        }, 1000);
+        } catch (err: any) {
+            console.error("Auth error:", err);
+            toast.error(err?.response?.data?.message || "Authentication failed");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -26,38 +43,65 @@ export default function Login() {
                     <div className="flex flex-col items-center mb-8">
                         <Link to="/" className="flex items-center gap-2">
                             <img src="/logo.svg" alt="Logo" className="size-6.5" />
-                            <h1 className="text-2xl">Scheduler</h1>
+                            <h1 className="text-2xl font-semibold text-slate-800">Scheduler</h1>
                         </Link>
-                        <p className="text-slate-500 text-sm mt-1">Sign in to your Dashboard</p>
+                        <p className="text-slate-500 text-sm mt-1">
+                            {loginState ? "Sign in to your Dashboard" : "Create your account"}
+                        </p>
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-5 text-sm">
                         {!loginState && (
                             <div>
-                                <label className="block mb-1.5">Name</label>
+                                <label className="block mb-1.5 font-medium text-slate-700">Name</label>
                                 <div className="relative">
                                     <User2Icon className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input type="text" required placeholder="Enter your name" className="w-full pl-10 pr-4 py-2.5 bg-slate-50 outline-slate-300 border border-slate-200 rounded-full" value={name} onChange={(e) => setName(e.target.value)} />
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Enter your name"
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 outline-slate-300 border border-slate-200 rounded-full"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
                                 </div>
                             </div>
                         )}
                         <div>
-                            <label className="block mb-1.5">Email</label>
+                            <label className="block mb-1.5 font-medium text-slate-700">Email</label>
                             <div className="relative">
                                 <MailIcon className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input type="email" required placeholder="you@company.com" className="w-full pl-10 pr-4 py-2.5 bg-slate-50 outline-slate-300 border border-slate-200 rounded-full" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <input
+                                    type="email"
+                                    required
+                                    placeholder="you@company.com"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 outline-slate-300 border border-slate-200 rounded-full"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
                             </div>
                         </div>
                         <div>
-                            <label className="block mb-1.5">Password</label>
+                            <label className="block mb-1.5 font-medium text-slate-700">Password</label>
                             <div className="relative">
                                 <LockIcon className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input type="password" required placeholder="********" className="w-full pl-10 pr-4 py-2.5 bg-slate-50 outline-slate-300 border border-slate-200 rounded-full" value={password} onChange={(e) => setPassword(e.target.value)} />
+                                <input
+                                    type="password"
+                                    required
+                                    placeholder="********"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 outline-slate-300 border border-slate-200 rounded-full"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
                             </div>
                         </div>
 
-                        <button type="submit" disabled={loading} className="w-full py-2.5 px-4 bg-linear-to-r from-red-600 to-red-500 text-white rounded-full text-sm transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full py-2.5 px-4 bg-linear-to-r from-red-600 to-red-500 text-white rounded-full text-sm font-medium transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer hover:opacity-95"
+                        >
                             {loading ? (
-                                "Signing in..."
+                                "Please wait..."
                             ) : (
                                 <>
                                     {loginState ? "Sign In" : "Sign Up"} <ArrowRightIcon className="size-4" />
@@ -70,14 +114,22 @@ export default function Login() {
                         {loginState ? (
                             <>
                                 Don't have an account?{" "}
-                                <button onClick={() => setLoginState(false)} className="text-red-600 hover:text-red-700">
+                                <button
+                                    type="button"
+                                    onClick={() => setLoginState(false)}
+                                    className="text-red-600 hover:text-red-700 font-medium cursor-pointer"
+                                >
                                     Create one free
                                 </button>
                             </>
                         ) : (
                             <>
                                 Already have an account?{" "}
-                                <button onClick={() => setLoginState(true)} className="text-red-600 hover:text-red-700">
+                                <button
+                                    type="button"
+                                    onClick={() => setLoginState(true)}
+                                    className="text-red-600 hover:text-red-700 font-medium cursor-pointer"
+                                >
                                     Sign In
                                 </button>
                             </>
