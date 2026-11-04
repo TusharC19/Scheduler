@@ -3,24 +3,41 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsx server.ts",
+    "server": "nodemon --exec tsx server.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "type": "module",
   "dependencies": {
+    "@google/genai": "^2.32.0",
+    "@types/node-cron": "^3.0.11",
+    "@zernio/node": "^0.2.1459",
+    "axios": "^1.21.0",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
+    "cron": "^4.4.0",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.4",
+    "multer": "^2.5.0",
+    "node-cron": "^4.6.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.0.1",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.6",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
-    "tsx": "^4.22.4",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3"
-  }
+  },
+  "description": ""
 }

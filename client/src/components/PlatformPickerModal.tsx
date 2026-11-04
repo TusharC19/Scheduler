@@ -31,7 +31,8 @@ const PlatformPickerModal = ({ connectedIds, connecting, onClose, onConnect }: P
                             <button key={p.id}
                                 disabled={isConnected || isConnecting}
                                 onClick={() => onConnect(p.id)}
-                                className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all ${isConnected ? "border-red-200 bg-red-50 cursor-default" : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 cursor-pointer"} ${isConnecting && "opacity-60"}`}>
+                                className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all 
+                                ${isConnected ? "border-red-200 bg-red-50 cursor-default" : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 cursor-pointer"} ${isConnecting && "opacity-60"}`}>
 
                                 {/* Icon */}
                                 <div className="p-2">
